@@ -1,6 +1,7 @@
+from app.models import Intrusion
 import app.schemas as _schemas
-import sqlalchemy.orm as _orm
 import app.services as _services
+import app.database as _db
 import fastapi as _fastapi
 
 
@@ -10,13 +11,10 @@ from fastapi import HTTPException
 from starlette.responses import Response
 from app.redis import init_redis_pool
 from typing import TYPE_CHECKING, List
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session
 
 
 app = _fastapi.FastAPI()
-# incluir router mais tarde3
 
 
 
@@ -26,8 +24,31 @@ async def startup_event():
     # criar repositório bd
 
 
+@app.post("/intrusion/{building_id}", response_model=_schemas.IntrusionResponse)
+def create_intrusion(
+                    building_id: int, # id do edificio
+                    intrusion: _schemas.IntrusionBase.building_id, 
+                    db: Session = _fastapi.Depends(_services.get_db), 
+                    time:int = time() #timestamp
+                    ):
 
-@app.post("/api/intrusion", response_model=_schemas._BaseIntrusion)
+    
+    intrusion = _services.IntrusionRepository.save(db=db, intrusion=intrusion)
+    return intrusion
+
+@app.get("/intrusion/{buildingId}", response_model=List[_schemas.IntrusionResponse])
+def get_intrusion(buildingId: int, db: Session = _fastapi.Depends(_services.get_db)):
+    """Get all intrusions from a building"""
+    return _services.IntrusionRepository.get_all_by_building(db=db, buildingId=buildingId)
+
+
+@app.get("/buildings", response_model=List[_schemas.BuildingResponse])
+def get_buildings(db: Session = _fastapi.Depends(_services.get_db)):
+    """Get all buildings"""
+    return _services.BuildingRepository.get_all(db=db) 
+
+
+""" @app.post("/api/intrusion", response_model=_schemas._BaseIntrusion)
 async def create_intrusion(
     intrusion: _schemas._BaseIntrusion, 
     db: _orm.Session = _fastapi.Depends(_services.get_db)
@@ -81,7 +102,7 @@ async def update_intrusion(
         return _fastapi.HTTPException(status_code=404, detail="Intrusion not found")
   
     return await _services.update_intrusion(intrusion_id=intrusion, intrusion=intrusion_data ,db=db)
-
+ 
 
 
 
@@ -104,3 +125,4 @@ def getIntrusionData(timestamp: str, num_humans: int):
 @app.put("/videoClips")
 def storeVideoClips():
     return {"message": "send video clips to AWS S3"}
+"""

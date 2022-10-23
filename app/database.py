@@ -3,7 +3,7 @@ import sqlalchemy.ext.declarative as _declarative
 import sqlalchemy.orm as _orm
 
 
-DATABASE_URL = "postgresql://myuser:password@localhost/intrusion_api"
+DATABASE_URL = "postgresql://myuser:password@localhost/intrusion_db"
 
 engine = _sql.create_engine(DATABASE_URL)
 

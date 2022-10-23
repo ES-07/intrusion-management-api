@@ -1,21 +1,87 @@
-import datetime as _dt
-import pydantic as _pydantic
+from datetime import datetime, date
+from pydantic import BaseModel
+from sqlalchemy import Date
+from app.enums import Notification_type, DeviceState
 
 
-class _BaseUser(_pydantic.BaseModel):
-    name: str
+
+
+class PersonBase(BaseModel):
     email: str
-
-class _BaseProperty(_pydantic.BaseModel):
+    password: str
+    id: int
     name: str
-    location: str
+    address: str
+    cellphone : int
+    birthday: date 
 
-class _BaseCamera(_pydantic.BaseModel):
+class PersonRequest(PersonBase):
+    pass
+
+class PersonResponse(PersonBase):
+    id_number: int
+    class Config:
+        orm_mode = True
+
+
+
+
+## PROPERTY OWNER
+class PropertyOwnerBase(PersonBase):
+    contract_date: date 
+    notification_type :Notification_type 
+
+  
+class PropertyOwnerRequest(PropertyOwnerBase):
+    pass  
+
+class PropertyOwnerResponse(PropertyOwnerBase):
+    property_owner_id: int
+    class Config:
+        use_enum_values = True
+        orm_mode = True
+
+
+
+## SECURITY MANAGER
+
+class SecurityManagerBase(BaseModel):
+    pass
+
+class SecurityManagerRequest(SecurityManagerBase):
+    pass
+
+class SecurityManagerResponse(SecurityManagerBase):
+    id_number: int
+    class Config:
+        orm_mode = True
+   
+
+## BUILDINGS
+
+class BuildingBase(BaseModel): 
+    address:str
     name: str
-    location: str
+    client : int 
+    #devices: List[Device]
+    #nao sei como meter aqui a pessoa
 
-class _BaseIntrusion(_pydantic.BaseModel):
-    timestamp: _dt.datetime
+class BuildingRequest(BuildingBase):
+    pass
 
+class BuildingResponse(BuildingBase):
+    building_id: int
+    class Config:
+        orm_mode = True 
+
+class IntrusionBase(BaseModel):
+    intrusion_time: datetime
+    building_id: int
+
+class IntrusionRequest(IntrusionBase):
+    pass
+
+class IntrusionResponse(IntrusionBase):
+    intrusion_id: int
     class Config:
         orm_mode = True

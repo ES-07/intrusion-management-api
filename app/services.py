@@ -1,14 +1,9 @@
-from typing import TYPE_CHECKING
-from fastapi import HTTPException
-
-from pyparsing import List
-
+from requests import delete
 import app.database as _db
-import app.models as _models
-import app.schemas as _schemas
 
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
+from app.models import *
+
+from sqlalchemy.orm import Session
 
 
 def _add_tables():
@@ -21,54 +16,119 @@ def get_db():
     finally:
         db.close()
 
-async def create_intrusion(
-    intrusion: _schemas._BaseIntrusion, 
-    db: "Session"
-)-> _schemas._BaseIntrusion:
-    intrusion = _models.Intrusion(**intrusion.dict())
-    db.add(intrusion)
-    db.commit()
-    db.refresh(intrusion)
-    return _schemas._BaseIntrusion.from_orm(intrusion)
+class SecurityManagerRepository:
+
+    @staticmethod
+    def get_all(db: Session):
+        return db.query(SecurityManager).all()
+
+    @staticmethod
+    def find_by_id(db: Session, id: int):
+        return db.query(SecurityManager).filter(SecurityManager.id == id).first()
+
+    @staticmethod
+    def save(db: Session, security_manager: SecurityManager):
+        if security_manager.id_number:
+            db.merge(security_manager)
+        else:
+            db.add(security_manager)
+        db.commit()
+        return security_manager
+
+    @staticmethod
+    def delete(db: Session, id: int):
+        manager = SecurityManagerRepository.find_by_id(db=db, id=id)
+        if manager is not None:
+            db.delete(manager)
+            db.commit
+            return True
+        return False
+
+class PropertyOwnerRepository:
+
+    @staticmethod
+    def get_all(db: Session):
+        return db.query(PropertyOwner).all()
+
+    @staticmethod
+    def find_by_id(db: Session, id: int):
+        return db.query(PropertyOwner).filter(PropertyOwner.id == id).first()
+
+    @staticmethod
+    def save(db: Session, property_owner: PropertyOwner):
+        if property_owner.id_number:
+            db.merge(property_owner)
+        else:
+            db.add(property_owner)
+        db.commit()
+        return property_owner
+
+    @staticmethod
+    def delete(db: Session, id: int):
+        owner = PropertyOwnerRepository.find_by_id(db=db, id=id)
+        if owner is not None:
+            db.delete(owner)
+            db.commit
+            return True
+        return False
+
+class BuildingRepository:
+
+    @staticmethod
+    def get_all(db: Session):
+        return db.query(Building).all()
+
+    @staticmethod
+    def find_by_id(db: Session, id: int):
+        return db.query(Building).filter(Building.id == id).first()
+
+    @staticmethod
+    def save(db: Session, building: Building):
+        if building.id_number:
+            db.merge(building)
+        else:
+            db.add(building)
+        db.commit()
+        return building
+
+    @staticmethod
+    def delete(db: Session, id: int):
+        building = BuildingRepository.find_by_id(db=db, id=id)
+        if building is not None:
+            db.delete(building)
+            db.commit
+            return True
+        return False
 
 
-
-async def get_all_intrusions(
-    db: "Session"
-)-> List[_schemas._BaseIntrusion]:
-    intrusions = db.query(_models.Intrusion).all()
-    return list(map(_schemas._BaseIntrusion.from_orm, intrusions))
+class IntrusionRepository:
 
 
+    @staticmethod
+    def find_by_id(db: Session, id: int):
+        return db.query(Intrusion).filter(Intrusion.id == id).first()
+
+    @staticmethod
+    def save(db: Session, intrusion: Intrusion):
+        if intrusion.id_number:
+            db.merge(intrusion)
+        else:
+            db.add(intrusion)
+        db.commit()
+        return intrusion
 
 
-async def get_intrusion(
-    intrusion_id: int, 
-    db: "Session"
-)-> _models.Intrusion:
-    intrusion = db.query(_models.Intrusion).filter(_models.Intrusion.id == intrusion_id).first()
-    if intrusion is None:
-        raise HTTPException(status_code=404, detail="Intrusion not found")
-    return intrusion
+    @staticmethod
+    def get_all_by_building(db: Session, buildingId: int):
+        lst = db.query(Intrusion).all()
+        rtn_lst=[]
+        
+        for i in lst:
+            if i.building_id == buildingId:
+                rtn_lst.append(i)
 
 
-async def delete_intrusion(
-    intrusion: _models.Intrusion, 
-    db: "Session"
-):
-    db.delete(intrusion)
-    db.commit()
+        print(rtn_lst)
+        return lst
 
-
-async def update_intrusion(
-    intrusion_id: _schemas._BaseIntrusion,
-    intrusion: _models.Intrusion,
-    db: "Session",
-)-> _schemas._BaseIntrusion:
     
-
-    intrusion.timestamp = intrusion_id.timestamp 
-    db.commit()
-    db.refresh(intrusion)
-
-    return _schemas._BaseIntrusion.from_orm(intrusion)
