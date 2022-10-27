@@ -12,7 +12,7 @@ on:
     
 jobs:
 
-  continuous-integration:
+  ci-cd:
     runs-on: ubuntu-latest
     steps:
       # Step 1      
@@ -44,18 +44,9 @@ jobs:
       - name: Activate venv and Run Tests     
         run: . venv/bin/activate && pytest
       # Step 7
-      - name: Create Zipfile archive of Dependencies
-        run: |
-          cd ./venv/lib/python*/site-packages
-          zip -r9 ../../../../intrusion-api.zip .
-      
+      - name: Build Docker-compose
+        run: docker-compose build
       # Step 8
-      - name: Add App to Zip file
-        run: cd ./app && zip -g ../intrusion-api.zip -r .
-      
-      # Step 9
-      - name: Upload zip file artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: api
-          path: intrusion-api.zip
+      - name: Run Docker-compose servies
+        run: docker-compose up -d
+
