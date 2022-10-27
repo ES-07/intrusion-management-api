@@ -5,7 +5,7 @@ app = FastAPI()
 # incluir router mais tarde3
 
 @app.get("/hello")
-def hello():
+def hello():    
     return {"message": "Hello world. O projeto está feito meus caros"}
 
 
