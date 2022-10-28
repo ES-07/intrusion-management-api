@@ -1,5 +1,8 @@
+from time import time
 from fastapi import FastAPI, HTTPException
 from starlette.responses import Response
+
+from app.api.notification import Notification
 
 app = FastAPI()
 # incluir router mais tarde3
@@ -21,8 +24,14 @@ def hello():
 def getIntrusionData(request):
     data = request.data
     print(data)
+    timestamp = data['timestamp']
+    camera_id = data['camera_id']
+    frame_id = data['frame_id']
+    notificate_client(timestamp, camera_id, frame_id)
+    activate_alarms()
+    request_video()
+    store_video()
     return {"message": "check if an intrusion occurs"}
-
 
 @app.get("/intrusion/frames")
 def getVideoFrames():
@@ -48,3 +57,30 @@ def activateAlarms():
 @app.post("/intrusion/notification")
 def sendNotification():
     return {"message": "send request to notification API"}
+
+
+def notificate_client(timestamp, camera_id, frame_id):
+
+    RABBIT_MQ_URL = "localhost:5672"
+    RABBIT_MQ_USERNAME = "myuser"
+    RABBIT_MQ_PASSWORD = "mypassword"
+    RABBIT_MQ_EXCHANGE_NAME = "intrusion-management-exchange"
+    RABBIT_MQ_QUEUE_NAME = "intrusion-management-queue"
+
+    notification = Notification()
+    notification.attach_to_message_broker(
+        RABBIT_MQ_URL, 
+        RABBIT_MQ_USERNAME, 
+        RABBIT_MQ_PASSWORD, 
+        RABBIT_MQ_EXCHANGE_NAME, 
+        RABBIT_MQ_QUEUE_NAME
+    )
+    
+    def activate_alarms():
+        pass
+
+    def request_video():
+        pass
+
+    def store_video():
+        pass
