@@ -14,7 +14,7 @@ def hello():
 
 @app.get("/hello")
 def hello():    
-    return {"message": "Hello world. O projeto está feito meus caros"}
+    return {"message": "Hello marta"}
 
 
 @app.post("/intrusion")
