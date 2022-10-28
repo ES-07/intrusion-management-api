@@ -8,13 +8,13 @@ app = FastAPI()
 def hello():    
     return {"message": "CI/CD done in AWS EC2"}
 
-@app.get("/artur")
+@app.get("/marta")
 def hello():    
-    return {"message": "reidreds"}
+    return {"message": "paiga"}
 
 @app.get("/hello")
 def hello():    
-    return {"message": "Hello marta"}
+    return {"message": "Hello world. O projeto está feito meus caros"}
 
 
 @app.post("/intrusion")
