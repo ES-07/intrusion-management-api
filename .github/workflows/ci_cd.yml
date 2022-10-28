@@ -38,6 +38,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
       # Step 5
+      - name: ls -la
+        run: ls -la
+      # Step 5
       - name: Activate and Install Depencies into Virtual env
         run: python -m venv venv && source venv/bin/activate &&
           pip3 install -r app/requirements.txt
