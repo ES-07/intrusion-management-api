@@ -38,7 +38,7 @@ jobs:
             ${{ runner.os }}-venv-
       # Step 5
       - name: Activate and Install Depencies into Virtual env
-        run: python -m venv venv && source venv/bin/activate && pip3 install -r app/requirements.txt
+        run: python3 -m venv venv && source venv/bin/activate && pip3 install -r app/requirements.txt
       # Step 6     
       - name: a       
         run: pip3 install pytest
