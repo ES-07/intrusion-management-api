@@ -15,7 +15,6 @@ jobs:
   ci-cd:
 
     runs-on: [self-hosted, linux, x64]
-
     steps:
       # Step 1      
       - uses: actions/checkout@v2
@@ -38,19 +37,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
       # Step 5
-      - name: ls -la
-        run: ls -la
-      # Step 5
       - name: Activate and Install Depencies into Virtual env
-        run: python -m venv venv && source venv/bin/activate &&
-          pip3 install -r app/requirements.txt
+        run: python -m venv venv && source venv/bin/activate && pip3 install -r app/requirements.txt
         if: steps.cache-venv.outputs.cache-hit != 'true'
       # Step 6     
       - name: Activate venv and Run Test        
-        run: source venv/bin/activate && cd app/ && pytest
+        run: pytest app/tests
       # Step 7
       - name: Build Docker-compose
-        run: sudo docker-compose build
+        run: cd app/ && sudo docker-compose build
       # Step 8
       - name: Run Docker-compose servies
         run: sudo docker-compose up -d
