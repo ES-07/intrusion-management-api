@@ -8,6 +8,10 @@ app = FastAPI()
 def hello():    
     return {"message": "CI/CD done in AWS EC2"}
 
+@app.get("/artur")
+def hello():    
+    return {"message": "reidreds"}
+
 @app.get("/hello")
 def hello():    
     return {"message": "Hello world. O projeto está feito meus caros"}
