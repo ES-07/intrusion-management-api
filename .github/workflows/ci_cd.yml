@@ -25,9 +25,7 @@ jobs:
           architecture: x64
       # Step 3
       - name: Install Python Virtual ENV
-        run: pip3 install virtualenv
-      - name: Install pytest
-        run: pip3 install pytest
+        run: pip3 install -U --force-reinstall virtualenv
       # Step 4
       - name:  Setup Virtual env
         uses: actions/cache@v2
