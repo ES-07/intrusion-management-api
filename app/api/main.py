@@ -76,11 +76,11 @@ def notificate_client(timestamp, camera_id, frame_id):
         RABBIT_MQ_QUEUE_NAME
     )
     
-    def activate_alarms():
-        pass
+def activate_alarms():
+    pass
 
-    def request_video():
-        pass
+def request_video():
+    pass
 
-    def store_video():
-        pass
+def store_video():
+    pass
