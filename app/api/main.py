@@ -4,8 +4,16 @@ from starlette.responses import Response
 app = FastAPI()
 # incluir router mais tarde3
 
+@app.get("/")
+def hello():    
+    return {"message": "CI/CD done in AWS EC2"}
+
+@app.get("/marta")
+def hello():    
+    return {"message": "paiga"}
+
 @app.get("/hello")
-def hello():
+def hello():    
     return {"message": "Hello world. O projeto está feito meus caros"}
 
 
