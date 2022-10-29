@@ -12,24 +12,18 @@ on:
     
 jobs:
 
-  ci-cd:
+  continuous-integration:
 
     runs-on: self-hosted
     defaults:
       run:
         working-directory: ./
     steps:
-      # Step 1      
       - uses: actions/checkout@v2
-      # Step 2
       - name: Set up Python 
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      # Step 3
-      # - name: Install Python Virtual ENV
-      #   run: pip3 install virtualenv
-      # Step 4
       - name:  Setup Virtual env
         uses: actions/cache@v2
         id: cache-venv
@@ -38,22 +32,34 @@ jobs:
           key: ${{ runner.os }}-venv-${{ hashFiles('**/requirements*.txt') }}
           restore-keys: |
             ${{ runner.os }}-venv-
-      # Step 5
-      - name: ls
-        run: ls -la
-      - name: cd app
-        run: cd app && ls -la
-      - name: venv
-        run: cd venv && ls -la
       - name: Activate and Install Depencies into Virtual env
-        run: source venv/bin/activate && pip install -r app/requirements.txt
-      # Step 6     
+        run: source venv/bin/activate && pip install -r app/requirements.txt   
       - name: Activate venv and Run Test        
         run: cd app/ && pytest 
-      # Step 7
+      
+  continuous-deployment:
+
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: app/
+      - name: Checkout 
+        uses: actions/checkout@v2 
       - name: Build Docker-compose
-        run: cd app/ && sudo docker-compose build
-      # Step 8
+        run: sudo docker-compose build
       - name: Run Docker-compose servies
-        run: cd app/ && sudo docker-compose up -d
+        run: sudo docker-compose up -d
+      - name: Configure AWS credentials 
+        uses: aws-actions/configure-aws-credentials@v1 
+        with: 
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} 
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+          aws-region: eu-west-3
+      - name: Copy our python module to our S3 bucket with the AWS CLI 
+        run: | 
+          aws s3 cp factorial.py s3://video-clips-archive-es007
+          aws s3 ls s3://video-clips-archive-es007
+  
+
+
 
