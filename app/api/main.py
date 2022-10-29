@@ -1,5 +1,42 @@
 from fastapi import FastAPI, HTTPException
 from starlette.responses import Response
+import requests
+import time
+import datetime
+import pydantic 
+
+
+
+
+
+BASE_URL = "http://localhost:8001"
+
+class Config:
+    arbitrary_types_allowed = True
+
+@pydantic.dataclasses.dataclass(config=Config)
+class Intrusion:
+    timestamp: int
+    first_frame: int
+    frame_id: int
+
+    def __init__(self, timestamp, first_frame, frame_id)->None:
+        self.timestamp = timestamp
+        self.first_frame = first_frame
+        self.frame_id = frame_id
+
+    def getFirstFrameTimeStamp(self):
+        # 0 ---------------- first_frame
+        # frame_id --------- timestamp
+        self.start = self.timestamp - 3 * 60 if self.timestamp -3 * 60 > self.first_frame else self.first_frame
+        # checkar se o vídeo não está no fim
+        self.end = self.timestamp + 3 * 60
+        return self.start, self.end
+        
+
+
+
+
 
 app = FastAPI()
 # incluir router mais tarde3
@@ -18,14 +55,19 @@ def hello():
 
 
 @app.post("/intrusion")
-def getIntrusionData(request):
-    data = request.data
-    print(data)
-    return {"message": "check if an intrusion occurs"}
+def getIntrusionData(intrusion: Intrusion):
+    # chega um timestamp que depois é passado às câmaras
+    
+    start, end = intrusion.getFirstFrameTimeStamp()
+    getVideoFrames(start, end)
+
+    return {"Intrusion": "detected", "timestamp": intrusion.timestamp, "frame": intrusion.frame_id}
 
 
 @app.get("/intrusion/frames")
-def getVideoFrames():
+def getVideoFrames(start, end):
+    response = requests.get(BASE_URL+'/video?start='+str(start)+'&end='+str(end))
+
     return {"message": "get the video frames"}
 
 
