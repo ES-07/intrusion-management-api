@@ -1,9 +1,16 @@
-from fastapi import FastAPI, HTTPException
-from starlette.responses import Response
+from app.models import Intrusion
+from fastapi import FastAPI, Depends, Form
 from app.redis import init_redis_pool
+from fastapi.encoders import jsonable_encoder
+import requests, json
 
-app = FastAPI()
+app = FastAPI(
+    openapi_url="/openapi.json",
+    docs_url="/docs",)
 # incluir router mais tarde3
+
+# API_GATEWAY = <link>
+API_SITES = 'http://localhost:8002'
 
 @app.on_event("startup")
 async def startup_event():
@@ -13,37 +20,42 @@ async def startup_event():
 
 @app.get("/")
 def root():
-    return {"message": "Hello world. O projeto está feito meus caros"}
+    return {"message": "Welcome to Intrusion Management API :)"}
 
 
-@app.post("/intrusion")
-def getIntrusionData(request):
-    data = request.data
-    print(data)
-    return {"message": "check if an intrusion occurs"}
+@app.post("/intrusions")
+async def getIntrusionData(building_id: int = Form(), device_id: int = Form(), timestamp: str = Form()):
+    payload = {"building_id": building_id, "device_id": device_id, "timestamp": timestamp}
+    sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
+
+    if sent_to_sitesAPI.status_code == 200:
+        print(json.loads(sent_to_sitesAPI.content.decode('utf-8')))
+
+    return sent_to_sitesAPI.content
+    
 
 
-@app.get("/intrusion/frames")
+@app.get("/intrusions/frames")
 def getVideoFrames():
     return {"message": "get the video frames"}
 
 
-@app.get("/intrusion/video")
+@app.get("/intrusions/videos")
 def getVideo():
     return {"message": "get video from cameras"}
 
 
-@app.post("/intrusion/video")
+@app.post("/intrusions/videos")
 def saveClips():
     """ sendo to AWS S3 """
     return {"message": "save the video clip in ASW S3"}
 
 
-@app.post("/intrusion/activate")
+@app.post("/intrusions/activates")
 def activateAlarms():
     return {"message": "send to message queue to activate alarms"}
 
 
-@app.post("/intrusion/notification")
+@app.post("/intrusions/notifications")
 def sendNotification():
     return {"message": "send request to notification API"}

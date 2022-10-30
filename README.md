@@ -1,7 +1,7 @@
 ## Intrusion Management Api
 ### How to run
 
-dentro da diretoria /app
+dentro da diretoria root
 ```
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
