@@ -1,4 +1,3 @@
-from app.models import Intrusion
 from fastapi import FastAPI, Depends, Form
 from app.redis import init_redis_pool
 from fastapi.encoders import jsonable_encoder
