@@ -16,18 +16,19 @@ class Config:
     arbitrary_types_allowed = True
 
 @pydantic.dataclasses.dataclass(config=Config)
-class Intrusion(BaseModel):
+class Intrusion:
     timestamp: str
     building_id: int
     device_id: int
 
+    def __init__(self, timestamp, building_id, device_id) -> None:
+        self.timestamp = timestamp
+        self.building_id = building_id
+        self.device_id = device_id
+
+
     def getFirstFrameTimeStamp(self):
-        # 0 ---------------- first_frame
-        # frame_id --------- timestamp
-        self.start = self.timestamp - 3 * 60 if self.timestamp -3 * 60 > self.first_frame else self.first_frame
-        # checkar se o vídeo não está no fim
-        self.end = self.timestamp + 3 * 60
-        return self.start, self.end
+        pass
         
 
 @pydantic.dataclasses.dataclass(config=Config)
@@ -57,12 +58,16 @@ def root():
 
 @app.post("/intrusions")
 async def getIntrusionData(new_intrusion : Intrusion):
+    
     payload = {"building_id": new_intrusion.building_id, "device_id": new_intrusion.device_id, "timestamp": new_intrusion.timestamp}
-    sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
-
+    
+    getVideoFrames(0,100)
+    
+    """sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
     if sent_to_sitesAPI.status_code == 200:
         print(json.loads(sent_to_sitesAPI.content.decode('utf-8')))
-    return sent_to_sitesAPI.content
+    return sent_to_sitesAPI.content"""
+    return {"message": "Intrusion data received"}
     
 
 """
