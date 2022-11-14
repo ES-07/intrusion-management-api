@@ -5,26 +5,21 @@ import time
 import datetime
 import pydantic 
 import boto3
+from pydantic import BaseModel
 
-
-
-
-
+# API_GATEWAY = <link>
+API_SITES = 'http://localhost:8002'
 BASE_URL = "http://localhost:8001"
+
 
 class Config:
     arbitrary_types_allowed = True
 
 @pydantic.dataclasses.dataclass(config=Config)
-class Intrusion:
-    timestamp: int
-    first_frame: int
-    frame_id: int
-
-    def __init__(self, timestamp, first_frame, frame_id)->None:
-        self.timestamp = timestamp
-        self.first_frame = first_frame
-        self.frame_id = frame_id
+class Intrusion(BaseModel):
+    timestamp: str
+    building_id: int
+    device_id: int
 
     def getFirstFrameTimeStamp(self):
         # 0 ---------------- first_frame
@@ -50,23 +45,10 @@ class VideoStore:
 
 
 s3 = boto3.client('s3')
-
-
 app = FastAPI(
     openapi_url="/openapi.json",
     docs_url="/docs",)
-# incluir router mais tarde3
 
-
-# API_GATEWAY = <link>
-API_SITES = 'http://localhost:8002'
-
-""" 
-@app.on_event("startup")
-async def startup_event():
-    # app.state.redis = await init_redis_pool()
-    # criar repositório bd
-"""
 
 @app.get("/")
 def root():
@@ -74,8 +56,8 @@ def root():
 
 
 @app.post("/intrusions")
-async def getIntrusionData(building_id: int = Form(), device_id: int = Form(), timestamp: str = Form()):
-    payload = {"building_id": building_id, "device_id": device_id, "timestamp": timestamp}
+async def getIntrusionData(new_intrusion : Intrusion):
+    payload = {"building_id": new_intrusion.building_id, "device_id": new_intrusion.device_id, "timestamp": new_intrusion.timestamp}
     sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
 
     if sent_to_sitesAPI.status_code == 200:
