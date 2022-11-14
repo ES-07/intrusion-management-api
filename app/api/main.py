@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException
+import requests, json
+from fastapi import FastAPI, HTTPException, Form
 from starlette.responses import Response
-import requests
 import time
 import datetime
 import pydantic 
@@ -50,23 +50,42 @@ class VideoStore:
 
 
 s3 = boto3.client('s3')
-contador=0
 
-app = FastAPI()
+
+app = FastAPI(
+    openapi_url="/openapi.json",
+    docs_url="/docs",)
 # incluir router mais tarde3
 
+
+# API_GATEWAY = <link>
+API_SITES = 'http://localhost:8002'
+
+""" 
+@app.on_event("startup")
+async def startup_event():
+    # app.state.redis = await init_redis_pool()
+    # criar repositório bd
+"""
+
 @app.get("/")
-def hello():    
-    return {"message": "CI/CD done in AWS EC2"}
+def root():
+    return {"message": "Welcome to Intrusion Management API :)"}
 
-@app.get("/marta")
-def hello():    
-    return {"message": "paiga"}
 
-@app.get("/hello")
-def hello():    
-    return {"message": "Hello world. O projeto está feito meus caros"}
+@app.post("/intrusions")
+async def getIntrusionData(building_id: int = Form(), device_id: int = Form(), timestamp: str = Form()):
+    payload = {"building_id": building_id, "device_id": device_id, "timestamp": timestamp}
+    sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
 
+    if sent_to_sitesAPI.status_code == 200:
+        print(json.loads(sent_to_sitesAPI.content.decode('utf-8')))
+    return sent_to_sitesAPI.content
+    
+
+"""
+@app.get("/intrusions/frames")
+def getVideoFrames():
 
 @app.post("/intrusion")
 def newIntrusionData(intrusion: Intrusion):
@@ -76,18 +95,18 @@ def newIntrusionData(intrusion: Intrusion):
     getVideoFrames(start, end)
 
     return {"Intrusion": "detected", "timestamp": intrusion.timestamp, "frame": intrusion.frame_id}
-
+"""
 
 @app.get("/intrusion/frames")
 def getVideoFrames(start, end):
     response = requests.get(BASE_URL+'/video?start='+str(start)+'&end='+str(end))
-
     return {"message": "get the video frames"}
 
 
-@app.get("/intrusion/video")
+@app.get("/intrusions/videos")
 def getVideo():
     return {"message": "get video from cameras"}
+
 
 
 @app.post("/intrusion/video")
@@ -97,11 +116,11 @@ def saveClips(video: VideoStore):
     return {"message": "video saved"}
 
 
-@app.post("/intrusion/activate")
+@app.post("/intrusions/activates")
 def activateAlarms():
     return {"message": "send to message queue to activate alarms"}
 
 
-@app.post("/intrusion/notification")
+@app.post("/intrusions/notifications")
 def sendNotification():
     return {"message": "send request to notification API"}
