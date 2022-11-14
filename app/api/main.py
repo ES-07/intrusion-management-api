@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Form
-from app.redis import init_redis_pool
+# from redis import init_redis_pool
 import requests, json
 
 app = FastAPI(
@@ -11,11 +11,12 @@ app = FastAPI(
 # API_GATEWAY = <link>
 API_SITES = 'http://localhost:8002'
 
+""" 
 @app.on_event("startup")
 async def startup_event():
-    app.state.redis = await init_redis_pool()
+    # app.state.redis = await init_redis_pool()
     # criar repositório bd
-
+"""
 
 @app.get("/")
 def root():
