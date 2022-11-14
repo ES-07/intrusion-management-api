@@ -4,6 +4,7 @@ import requests
 import time
 import datetime
 import pydantic 
+import boto3
 
 
 
@@ -34,9 +35,22 @@ class Intrusion:
         return self.start, self.end
         
 
+@pydantic.dataclasses.dataclass(config=Config)
+class VideoStore:
+    path_to_video: str
+    bucket_name: str
+    video_name: str
+
+    def __init__(self, path_to_video, bucket_name, video_name)->None:
+        self.path_to_video = path_to_video
+        self.bucket_name = bucket_name
+        self.video_name = video_name
 
 
 
+
+s3 = boto3.client('s3')
+contador=0
 
 app = FastAPI()
 # incluir router mais tarde3
@@ -55,7 +69,7 @@ def hello():
 
 
 @app.post("/intrusion")
-def getIntrusionData(intrusion: Intrusion):
+def newIntrusionData(intrusion: Intrusion):
     # chega um timestamp que depois é passado às câmaras
     
     start, end = intrusion.getFirstFrameTimeStamp()
@@ -77,9 +91,10 @@ def getVideo():
 
 
 @app.post("/intrusion/video")
-def saveClips():
+def saveClips(video: VideoStore):
     """ sendo to AWS S3 """
-    return {"message": "save the video clip in ASW S3"}
+    s3.upload_file(video.path_to_video, video.bucket_name, video.video_name)
+    return {"message": "video saved"}
 
 
 @app.post("/intrusion/activate")
