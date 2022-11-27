@@ -2,9 +2,7 @@ import cv2
 import os
 import numpy as np
 import sys
-import time
 import kombu
-import boto3
 import requests
 
 
@@ -67,7 +65,7 @@ class Worker(ConsumerMixin):
                 BASE_URL+'/intrusion/video',
                 json={'path_to_video': VIDEO_NAME,
                       'bucket_name': 'video-clips-archive-es007',
-                      'video_name': f'record{self.contador}'}
+                      'video_name': f'record{self.contador}.mp4'}
             )
 
             self.contador += 1
