@@ -43,12 +43,12 @@ jobs:
   #   defaults:
   #     run:
         # working-directory: app/
-      - name: Checkout 
-        uses: actions/checkout@v2 
-      - name: Build Docker-compose
-        run: cd app/ && sudo docker-compose build
-      - name: Run Docker-compose servies
-        run: cd app/ && sudo docker-compose up -d
+      # - name: Checkout 
+      #   uses: actions/checkout@v2 
+      # - name: Build Docker-compose
+      #   run: cd app/ && sudo docker-compose build
+      # - name: Run Docker-compose servies
+      #   run: cd app/ && sudo docker-compose up -d
       # - name: Configure AWS credentials 
       #   uses: aws-actions/configure-aws-credentials@v1 
       #   with: 
