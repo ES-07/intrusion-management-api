@@ -13,11 +13,10 @@ on:
 jobs:
 
   continuous-development:
-
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: app
+        working-directory: ../app
     steps:
       - run: ls -la
       - run: docker build -t intrusion-management-api:latest .
