@@ -19,6 +19,7 @@ jobs:
       run:
         working-directory: ./
     steps:
+      - run: ls
       - run: docker build -t intrusion-management-api:latest .
       - name: Push to ECR
         id: ecr
