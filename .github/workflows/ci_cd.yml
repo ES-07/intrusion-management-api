@@ -12,12 +12,12 @@ on:
     
 jobs:
 
-  continuous-integration:
+  continuous-development:
 
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ../
+        working-directory: /app
     steps:
       - run: ls
       - run: docker build -t intrusion-management-api:latest .
