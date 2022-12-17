@@ -10,9 +10,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 
-
 # API_GATEWAY = <link>
-API_SITES = 'http://localhost:8002'
+API_SITES = 'http://localhost:8000'
 BASE_URL = "http://localhost:8001"
 
 # Load environment variables
@@ -58,7 +57,6 @@ class VideoStore:
 
 connection_string = f"amqp://{RABBIT_MQ_USERNAME}:{RABBIT_MQ_PASSWORD}" \
     f"@{RABBIT_MQ_URL}/"
-
 
 # Kombu Connection
 kombu_connection = kombu.Connection(connection_string, ssl=True)

@@ -11,15 +11,16 @@ on:
     - develop
     
 jobs:
-
   continuous-development:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ../app
+        working-directory: ./app
     steps:
-      - run: ls -la
-      - run: docker build -t intrusion-management-api:latest .
+      - name: LS
+        run: ls -a
+      - name: Build docker image
+        run: docker build -t intrusion-management-api:latest .
       - name: Push to ECR
         id: ecr
         uses: jwalton/gh-ecr-push@v1
