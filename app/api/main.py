@@ -11,9 +11,7 @@ from pathlib import Path
 import os
 
 
-# API_GATEWAY = <link>
-API_SITES = 'http://localhost:8002'
-BASE_URL = "http://localhost:8001"
+BASE_PREFIX = "/intrusion-management-api"
 
 # Load environment variables
 dotenv_path = Path('.env')
@@ -24,6 +22,7 @@ RABBIT_MQ_USERNAME = os.getenv('RABBIT_MQ_USERNAME')
 RABBIT_MQ_PASSWORD = os.getenv('RABBIT_MQ_PASSWORD')
 RABBIT_MQ_EXCHANGE_NAME = os.getenv('RABBIT_MQ_EXCHANGE_NAME')
 RABBIT_MQ_QUEUE_NAME = os.getenv('RABBIT_MQ_QUEUE_NAME')
+ALB_PREFIX = os.getenv('ALB_PREFIX')
 
 
 class Config:
@@ -93,12 +92,12 @@ app = FastAPI(
     docs_url="/docs")
 
 
-@app.get("/")
+@app.get(BASE_PREFIX + "/")
 def root():
     return {"message": "Welcome to Intrusion Management API :)"}
 
 
-@app.post("/intrusions")
+@app.post(BASE_PREFIX + "/intrusions")
 async def getIntrusionData(new_intrusion: Intrusion):
 
     payload = {"building_id": new_intrusion.building_id,
@@ -118,10 +117,10 @@ async def getIntrusionData(new_intrusion: Intrusion):
 
 
 """
-@app.get("/intrusions/frames")
+@app.get(BASE_PREFIX + "/intrusions/frames")
 def getVideoFrames():
 
-@app.post("/intrusion")
+@app.post(BASE_PREFIX + "/intrusion")
 def newIntrusionData(intrusion: Intrusion):
     # chega um timestamp que depois é passado às câmaras
     
@@ -132,20 +131,20 @@ def newIntrusionData(intrusion: Intrusion):
 """
 
 
-@app.get("/intrusion/frames")
+@app.get(BASE_PREFIX + "/intrusion/frames")
 def getVideoFrames(start, end):
-    response = requests.get(BASE_URL+'/video?start=' +
+    response = requests.get(ALB_PREFIX + '/video?start=' +
                             str(start)+'&end='+str(end))
 
     return {"message": "get the video frames"}
 
 
-@app.get("/intrusions/videos")
+@app.get(BASE_PREFIX + "/intrusions/videos")
 def getVideo():
     return {"message": "get video from cameras"}
 
 
-@app.post("/intrusion/video")
+@app.post(BASE_PREFIX + "/intrusion/video")
 def saveClips(video: VideoStore):
     """ sendo to AWS S3 """
 
@@ -153,7 +152,7 @@ def saveClips(video: VideoStore):
     return {"message": "video saved"}
 
 
-@app.post("/intrusions/activates")
+@app.post(BASE_PREFIX + "/intrusions/activates")
 def activateAlarms(timestamp):
     kombu_producer.publish(
         content_type='application/json',
@@ -162,6 +161,6 @@ def activateAlarms(timestamp):
     return {"message": "send to message queue to activate alarms"}
 
 
-@app.post("/intrusions/notifications")
+@app.post(BASE_PREFIX + "/intrusions/notifications")
 def sendNotification():
     return {"message": "send request to notification API"}
