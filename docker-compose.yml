@@ -4,6 +4,10 @@ services:
 
   fastapi:
     build: ./app
+    env_file:
+      - app/.env
+    args:
+      ALB_PREFIX : ${ALB_PREFIX}
     ports:
       - 8001:8000
     container_name: intrusion-backend-fastapi

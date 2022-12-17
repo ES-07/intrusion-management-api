@@ -1,5 +1,7 @@
 FROM python:3.9-slim
 
+ARG ALB_PREFIX=$ALB_PREFIX
+
 WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
