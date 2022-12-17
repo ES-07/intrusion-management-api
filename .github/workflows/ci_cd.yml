@@ -41,7 +41,9 @@ jobs:
 
     name: Push Image to ECR
     runs-on: ubuntu-latest
-     
+    defaults:
+      run:
+        working-directory: ./app
     steps:
     - name: Checkout 
       uses: actions/checkout@v2 
