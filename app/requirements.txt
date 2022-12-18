@@ -6,3 +6,5 @@ redis == 4.4.0rc1
 starlette==0.20.4
 python-multipart
 boto3
+kombu
+python-dotenv
