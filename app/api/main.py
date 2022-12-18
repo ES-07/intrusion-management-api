@@ -12,7 +12,7 @@ import os
 
 
 BASE_PREFIX = "/intrusion-management-api"
-
+CAMERAS_API = "http://13.38.103.68:8003"
 # Load environment variables
 dotenv_path = Path('.env')
 load_dotenv(dotenv_path=dotenv_path)
@@ -106,10 +106,9 @@ async def getIntrusionData(new_intrusion: Intrusion):
     getVideoFrames(0, 100)
     activateAlarms(new_intrusion.timestamp)
 
-    """sent_to_sitesAPI = requests.post(f"{API_SITES}/intrusions", json=payload)
+    sent_to_sitesAPI = requests.post(f"{ALB_PREFIX}/sites-management-api/intrusions", json=payload)
     if sent_to_sitesAPI.status_code == 200:
         print(json.loads(sent_to_sitesAPI.content.decode('utf-8')))
-    return sent_to_sitesAPI.content"""
 
     # mandar para o rabbitmq
 
@@ -133,7 +132,7 @@ def newIntrusionData(intrusion: Intrusion):
 
 @app.get(BASE_PREFIX + "/intrusion/frames")
 def getVideoFrames(start, end):
-    response = requests.get(ALB_PREFIX + '/video?start=' +
+    response = requests.get(CAMERAS_API + '/video?start=' +
                             str(start)+'&end='+str(end))
 
     return {"message": "get the video frames"}
