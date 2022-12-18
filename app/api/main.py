@@ -88,8 +88,8 @@ kombu_queue.declare()
 
 s3 = boto3.client('s3')
 app = FastAPI(
-    openapi_url="/openapi.json",
-    docs_url="/docs")
+    openapi_url=BASE_PREFIX + "/openapi.json",
+    docs_url=BASE_PREFIX + "/docs")
 
 
 @app.get(BASE_PREFIX + "/")
